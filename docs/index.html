@@ -82,6 +82,7 @@ footer { margin-top: 64px; color: var(--muted); font-size: 14px; }
 		<li><a href="#apple">macOS &amp; iOS</a></li>
 		<li><a href="#csharp">C#</a></li>
 		<li><a href="#updates">Updates &amp; versions</a></li>
+		<li><a href="#ai">AI agents</a></li>
 		<li><a href="#signing">Code signing</a></li>
 		<li><a href="#learn">Learning the engine</a></li>
 	</ul>
@@ -97,7 +98,7 @@ footer { margin-top: 64px; color: var(--muted); font-size: 14px; }
 <div class="table-wrap"><table>
 	<tr><th>Installer</th><th>Use it for</th></tr>
 	<tr><td><code>Spark-&lt;version&gt;-setup-x86_64.exe</code></td><td>GDScript games. Smaller, nothing else to install, and the only edition that exports to the Web.</td></tr>
-	<tr><td><code>Spark-CSharp-&lt;version&gt;-setup-x86_64.exe</code></td><td>Games scripted in C# (GDScript works too). Needs the <a href="https://dotnet.microsoft.com/download">.NET SDK 9 or newer</a> for C#.</td></tr>
+	<tr><td><code>Spark-CSharp-&lt;version&gt;-setup-x86_64.exe</code></td><td>Games scripted in C# (GDScript works too). Needs the <a href="https://dotnet.microsoft.com/download">.NET SDK 8 or newer</a> for C#.</td></tr>
 </table></div>
 <p>Running a newer installer of the same edition updates Spark in place; projects and settings are kept.</p>
 
@@ -161,7 +162,7 @@ footer { margin-top: 64px; color: var(--muted); font-size: 14px; }
 
 <h2 id="csharp">C#</h2>
 <ol>
-	<li>Install the .NET SDK 9 or newer and the Spark (C#) edition.</li>
+	<li>Install the .NET SDK 8 or newer and the Spark (C#) edition.</li>
 	<li>Attach a script and choose <b>C#</b>. Spark creates the <code>.csproj</code> and <code>.sln</code> files.</li>
 	<li>Build with the hammer button, or just run the game.</li>
 </ol>
@@ -171,6 +172,52 @@ footer { margin-top: 64px; color: var(--muted); font-size: 14px; }
 <p>The Project Manager shows <b>“Spark x.y is available”</b> when a newer version is released; click it to open the release page.</p>
 <p>Spark has its own version numbers (1.4, 1.5, …). Projects record the Spark version that last saved them, shown in the Project Manager; projects that were never opened in Spark show their Godot version there. Opening a project in a newer Spark updates it.</p>
 <p>Inside, Spark keeps a hidden compatibility level with the Godot version it's based on, so Godot projects, add-ons and tutorials keep working.</p>
+
+<h2 id="ai">AI agents</h2>
+<p>AI agents such as Claude and ChatGPT can connect to the Spark editor and work in the open project: look at scenes and scripts, add and change nodes, write scripts, run the game and read its errors, take screenshots and export. You watch, approve and undo what they do.</p>
+<h3>Switching it on</h3>
+<ol>
+	<li>Open <b>Editor &gt; AI Agents</b>.</li>
+	<li>Tick <b>Allow AI agents to connect</b>. The window shows “Listening on 127.0.0.1:7338” (or the next free port). The setting is remembered.</li>
+</ol>
+<ul>
+	<li>Only this computer can connect, and every request needs the <b>Token</b> shown in the window. <b>New Token</b> cuts off anyone using the old one.</li>
+	<li>If an agent is refused, the window says when and why.</li>
+</ul>
+<h3>Claude Code</h3>
+<p>Open the <b>Claude Code</b> tab, copy the line and run it once in a terminal. It adds Spark for every project. Claude starts a small helper that ships with Spark (<code>spark_mcp_bridge.exe</code>), so Spark can be opened and closed at any time: while Spark is closed its tools say so, and they work again a few seconds after it opens.</p>
+<h3>Claude Desktop</h3>
+<ol>
+	<li>Open the <b>Claude Desktop</b> tab and copy the JSON.</li>
+	<li>In Claude Desktop, go to <b>Settings &gt; Developer &gt; Edit Config</b> and add it to <code>claude_desktop_config.json</code> (merge it with any <code>mcpServers</code> already there).</li>
+	<li>Restart Claude Desktop.</li>
+</ol>
+<h3>ChatGPT and other apps</h3>
+<p>Apps on the same PC that connect to MCP servers over HTTP need the <b>URL</b> (<code>http://127.0.0.1:7338/mcp</code>) and an <code>Authorization</code> header with the value <code>Bearer</code> followed by the token. The <b>ChatGPT and Others</b> tab has both with Copy buttons. ChatGPT in the browser can't reach your PC yet.</p>
+<h3>Approvals</h3>
+<p><b>Changes by agents</b> sets when Spark asks you first:</p>
+<ul>
+	<li><b>Allowed without asking</b>: agents change the project freely.</li>
+	<li><b>Ask once per agent</b> (the default): a prompt the first time an agent wants to change something.</li>
+	<li><b>Ask every time</b>: a prompt for every change.</li>
+</ul>
+<p>The prompt shows the agent and what it wants to do, with <b>Allow Once</b>, <b>Allow This Agent</b>, <b>Deny</b> and <b>Block Agent</b>. An unanswered prompt is denied after two minutes. Looking at the project, reading files and taking screenshots never ask.</p>
+<h3>Working with agents</h3>
+<ul>
+	<li>Each change to a scene is one undo step named after the agent, e.g. <i>[claude-code] Add Coin</i>, so <kbd>Ctrl</kbd>+<kbd>Z</kbd> takes it back. Agents can also undo their own last change.</li>
+	<li>Writing files (scripts, shaders) and running editor scripts can't be undone with <kbd>Ctrl</kbd>+<kbd>Z</kbd>; use version control.</li>
+	<li>The window lists connected agents and an <b>Activity</b> feed of every call.</li>
+</ul>
+<div class="table-wrap"><table>
+	<tr><th>Tool</th><th>Does</th></tr>
+	<tr><td><code>get_project_info</code>, <code>list_files</code>, <code>read_file</code></td><td>Look at the project</td></tr>
+	<tr><td><code>get_scene_tree</code>, <code>get_node</code>, <code>get_class_info</code></td><td>Look at scenes, nodes and engine classes</td></tr>
+	<tr><td><code>create_scene</code>, <code>open_scene</code>, <code>save_scene</code></td><td>Make, open and save scenes</td></tr>
+	<tr><td><code>add_node</code>, <code>set_properties</code>, <code>delete_nodes</code>, <code>move_node</code></td><td>Edit the scene being edited</td></tr>
+	<tr><td><code>write_file</code>, <code>attach_script</code>, <code>connect_signal</code></td><td>Write scripts and wire them up</td></tr>
+	<tr><td><code>run_project</code>, <code>stop_project</code>, <code>get_output</code>, <code>screenshot</code></td><td>Test the game and see the result</td></tr>
+	<tr><td><code>run_editor_script</code>, <code>export_project</code>, <code>undo</code></td><td>Anything else, exporting, undoing</td></tr>
+</table></div>
 
 <h2 id="signing">Code signing</h2>
 <p>Unsigned installers and games make Windows show “Unknown publisher”. With a code-signing certificate in Playtime Studio's name:</p>
